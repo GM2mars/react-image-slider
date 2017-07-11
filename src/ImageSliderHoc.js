@@ -66,12 +66,14 @@ export default function ImageSliderHoc(Component) {
     images: PropTypes.array.isRequired,
     delay: PropTypes.number.isRequired,
     isInfinite: PropTypes.bool.isRequired,
+    shiftItems: PropTypes.number.isRequired
   }).isRequired;
 
   WrapperComponent.defaultProps = {
     isInfinite: true,
-    delay: 5000,
+    delay: 0,
     visibleItems: 4,
+    shiftItems: 1
   };
 
   return WrapperComponent;

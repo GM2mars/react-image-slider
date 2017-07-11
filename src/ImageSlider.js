@@ -35,13 +35,50 @@ class Slider extends React.Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.children.length !== nextProps.children.length) {
+      this.setState({ currentPosition: 0 });
+    }
+  }
+
+  isActiveLeftArrow() {
+    return Boolean(this.state.currentPosition);
+  }
+
+  isActiveRightArrow() {
+    const pos = this.state.currentPosition;
+    const count = this.props.children.length;
+    const visibleItems = this.props.visibleItems;
+
+    return count > (pos + visibleItems);
+  }
+
+  calcShiftLeft() {
+    const pos = this.state.currentPosition;
+    const shiftItems = this.props.shiftItems;
+
+    return shiftItems > pos ? 0 : pos - shift;
+  }
+
+  calcShiftRight() {
+    const pos = this.state.currentPosition;
+    const count = this.props.children.length;
+    const visibleItems = this.props.visibleItems;
+    const shiftItems = this.props.shiftItems;
+
+    const itemsToEdge = count - (pos + visibleItems);
+    const shift = itemsToEdge > shiftItems ? shiftItems : itemsToEdge;
+
+    return shift + pos;
+  }
+
   scrollLeft() {
-    const currentPosition = this.updatePosition(this.state.currentPosition - 1);
+    const currentPosition = this.updatePosition(this.calcShiftLeft());
     this.setState({ currentPosition });
   }
 
   scrollRight() {
-    const currentPosition = this.updatePosition(this.state.currentPosition + 1);
+    const currentPosition = this.updatePosition(this.calcShiftRight());
     this.setState({ currentPosition });
   }
 
@@ -111,6 +148,13 @@ class Slider extends React.Component {
       src: item,
     }));
 
+    let classNamesLeftArrow = 'rsc-navigation rsc-navigation_left rsc-arrow_left';
+    let classNamesRightArrow = 'rsc-navigation rsc-navigation_right rsc-arrow_right';
+
+    classNamesLeftArrow += this.isActiveLeftArrow() ? '' : ' rsc-arrow_left-pass';
+    classNamesRightArrow += this.isActiveRightArrow() ? '' : ' rsc-arrow_right-pass';
+
+
     return (
       <div className="rsc-container">
         <div className="rsc-slider" style={sliderStyle}>
@@ -122,8 +166,8 @@ class Slider extends React.Component {
         </div>
         {images.length > this.state.visibleItems ?
           <div>
-            <div className="rsc-navigation rsc-navigation_left rsc-arrow_left" onClick={this.scrollLeft}></div>
-            <div className="rsc-navigation rsc-navigation_right rsc-arrow_right" onClick={this.scrollRight}></div>
+            <div className={ classNamesLeftArrow } onClick={this.scrollLeft}/>
+            <div className={ classNamesRightArrow } onClick={this.scrollRight}/>
           </div>
         : null}
       </div>
